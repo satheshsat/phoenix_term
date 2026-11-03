@@ -52,6 +52,21 @@ class AppProvider extends ChangeNotifier {
   int _currentNavIndex = 0;
   int get currentNavIndex => _currentNavIndex;
 
+  // SFTP Target Host
+  HostModel? _sftpSelectedHost;
+  HostModel? get sftpSelectedHost => _sftpSelectedHost;
+
+  void openSftpForHost(HostModel host) {
+    _sftpSelectedHost = host;
+    _currentNavIndex = 3;
+    notifyListeners();
+  }
+
+  void setSftpSelectedHost(HostModel? host) {
+    _sftpSelectedHost = host;
+    notifyListeners();
+  }
+
   // Terminal Sessions
   final List<TerminalSessionModel> _sessions = [];
   int _activeSessionIndex = 0;

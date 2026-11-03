@@ -471,8 +471,8 @@ class _HostsScreenState extends State<HostsScreen> {
                     // SFTP button
                     OutlinedButton.icon(
                       onPressed: () {
-                        // Switch to SFTP screen
-                        provider.setNavIndex(3);
+                        // Switch to SFTP screen for this specific host
+                        provider.openSftpForHost(host);
                       },
                       icon: const FaIcon(FontAwesomeIcons.folderOpen, size: 13),
                       label: const Text('SFTP'),
