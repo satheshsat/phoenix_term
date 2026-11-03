@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.satcs" "\0"
-            VALUE "FileDescription", "term" "\0"
+            VALUE "FileDescription", "Phoenix Term" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "term" "\0"
+            VALUE "InternalName", "Phoenix Term" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.satcs. All rights reserved." "\0"
             VALUE "OriginalFilename", "term.exe" "\0"
-            VALUE "ProductName", "term" "\0"
+            VALUE "ProductName", "Phoenix Term" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -18,7 +18,7 @@ class TermApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => AppProvider(),
       child: MaterialApp(
-        title: 'term',
+        title: 'Phoenix Term',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
         home: const MainScreen(),

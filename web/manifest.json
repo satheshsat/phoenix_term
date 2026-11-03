@@ -1,6 +1,6 @@
 {
-    "name": "term",
-    "short_name": "term",
+    "name": "Phoenix Term",
+    "short_name": "Phoenix Term",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

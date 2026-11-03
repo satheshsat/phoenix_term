@@ -32,7 +32,7 @@ class StorageDataBundle {
   Map<String, dynamic> toJson() {
     return {
       'version': '1.0.0',
-      'appName': 'term',
+      'appName': 'Phoenix Term',
       'lastModified': lastModified.toIso8601String(),
       'settings': settings,
       'groups': groups.map((g) => g.toJson()).toList(),
