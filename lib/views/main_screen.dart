@@ -157,7 +157,7 @@ class MainScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Phoenix Term',
+                            'Phoenix Terminal',
                             style: TextStyle(
                               letterSpacing: 2.0,
                               fontWeight: FontWeight.w900,

@@ -1,6 +1,6 @@
 {
-    "name": "Phoenix Term",
-    "short_name": "Phoenix Term",
+    "name": "Phoenix Terminal",
+    "short_name": "Phoenix Terminal",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

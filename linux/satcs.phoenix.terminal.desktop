@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Phoenix Terminal
+GenericName=Terminal Client
+Comment=The Modern Terminal for Devops & Sysadmins
+Exec=termius_app
+Icon=satcs.phoenix.terminal
+Terminal=false
+Categories=Utility;System;TerminalEmulator;
+StartupWMClass=satcs.phoenix.terminal
+Keywords=terminal;ssh;sftp;phoenix;termius;
+

@@ -1,4 +1,4 @@
-package satcs.phoenix.term
+package satcs.phoenix.terminal
  
 import io.flutter.embedding.android.FlutterActivity
 

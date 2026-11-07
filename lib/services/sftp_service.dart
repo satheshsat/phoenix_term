@@ -184,7 +184,7 @@ echo "Deployment completed successfully!"
       '''# ~/.bashrc
 export PATH=\$PATH:/usr/local/bin
 alias ll='ls -la'
-alias phoenix='echo "Phoenix Term Ready"'
+alias phoenix='echo "Phoenix Terminal Ready"'
 ''',
     );
 

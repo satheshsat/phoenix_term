@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = Phoenix Term
+PRODUCT_NAME = Phoenix Terminal
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = satcs.phoenix.term
+PRODUCT_BUNDLE_IDENTIFIER = satcs.phoenix.terminal
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.satcs. All rights reserved.

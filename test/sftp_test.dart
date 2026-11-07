@@ -101,7 +101,7 @@ void main() {
 
     test('writeFile and readFile work seamlessly in simulated mode', () async {
       final testPath = '/home/user/test_note.txt';
-      final testContent = 'Hello from Phoenix Term SFTP!';
+      final testContent = 'Hello from Phoenix Terminal SFTP!';
       final testBytes = Uint8List.fromList(utf8.encode(testContent));
 
       await SftpService.writeFile(

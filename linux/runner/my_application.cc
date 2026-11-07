@@ -19,11 +19,134 @@ static void first_frame_cb(MyApplication* self, FlView* view) {
   gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
 }
 
+// Automatically registers the application and icon into the user's desktop
+// environment on first launch so that running from an extracted zip or folder
+// properly associates with the dock, panel, and application launcher.
+static void ensure_desktop_integration(const gchar* exe_path,
+                                       const gchar* icon_path) {
+  if (exe_path == nullptr || icon_path == nullptr) {
+    return;
+  }
+
+  const gchar* home = g_get_home_dir();
+  if (home == nullptr) {
+    return;
+  }
+
+  g_autofree gchar* apps_dir =
+      g_build_filename(home, ".local", "share", "applications", nullptr);
+  g_autofree gchar* icons_dir = g_build_filename(
+      home, ".local", "share", "icons", "hicolor", "1024x1024", "apps", nullptr);
+  g_autofree gchar* pixmaps_dir =
+      g_build_filename(home, ".local", "share", "pixmaps", nullptr);
+
+  g_mkdir_with_parents(apps_dir, 0755);
+  g_mkdir_with_parents(icons_dir, 0755);
+  g_mkdir_with_parents(pixmaps_dir, 0755);
+
+  g_autofree gchar* target_icon =
+      g_build_filename(icons_dir, "satcs.phoenix.terminal.png", nullptr);
+  g_autofree gchar* target_pixmap =
+      g_build_filename(pixmaps_dir, "satcs.phoenix.terminal.png", nullptr);
+
+  g_autoptr(GFile) src_icon_file = g_file_new_for_path(icon_path);
+  g_autoptr(GFile) dst_icon_file = g_file_new_for_path(target_icon);
+  g_autoptr(GFile) dst_pixmap_file = g_file_new_for_path(target_pixmap);
+
+  g_file_copy(src_icon_file, dst_icon_file, G_FILE_COPY_OVERWRITE, nullptr,
+              nullptr, nullptr, nullptr);
+  g_file_copy(src_icon_file, dst_pixmap_file, G_FILE_COPY_OVERWRITE, nullptr,
+              nullptr, nullptr, nullptr);
+
+  g_autofree gchar* target_desktop =
+      g_build_filename(apps_dir, "satcs.phoenix.terminal.desktop", nullptr);
+  g_autofree gchar* desktop_content = g_strdup_printf(
+      "[Desktop Entry]\n"
+      "Version=1.0\n"
+      "Type=Application\n"
+      "Name=Phoenix Terminal\n"
+      "GenericName=Terminal Client\n"
+      "Comment=The Modern Terminal for Devops & Sysadmins\n"
+      "Exec=\"%s\" %%U\n"
+      "Icon=%s\n"
+      "Terminal=false\n"
+      "Categories=Utility;System;TerminalEmulator;\n"
+      "StartupWMClass=%s\n",
+      exe_path, target_icon, APPLICATION_ID);
+
+  g_file_set_contents(target_desktop, desktop_content, -1, nullptr);
+}
+
+// Sets the application icon on the GTK window across all standard resolutions.
+static void set_window_icon(GtkWindow* window) {
+  g_autoptr(GError) error = nullptr;
+  g_autofree gchar* exe_path = g_file_read_link("/proc/self/exe", nullptr);
+  g_autofree gchar* exe_dir =
+      exe_path != nullptr ? g_path_get_dirname(exe_path) : nullptr;
+
+  const gchar* relative_paths[] = {
+      "data/app_icon.png",
+      "data/flutter_assets/assets/icon/app_icon.png",
+      "app_icon.png",
+      "satcs.phoenix.terminal.png",
+      "runner/app_icon.png",
+      "../../../../assets/icon/app_icon.png",
+      "../../../../linux/runner/app_icon.png",
+  };
+
+  g_autofree gchar* found_icon_path = nullptr;
+  if (exe_dir != nullptr) {
+    for (size_t i = 0; i < G_N_ELEMENTS(relative_paths); ++i) {
+      g_autofree gchar* candidate =
+          g_build_filename(exe_dir, relative_paths[i], nullptr);
+      if (g_file_test(candidate, G_FILE_TEST_EXISTS)) {
+        found_icon_path = g_strdup(candidate);
+        break;
+      }
+    }
+  }
+
+  if (found_icon_path != nullptr) {
+    GdkPixbuf* base_pixbuf = gdk_pixbuf_new_from_file(found_icon_path, &error);
+    if (base_pixbuf != nullptr) {
+      // Build an icon list of standard resolutions for optimal rendering in
+      // panel taskbars, Alt+Tab switchers, docks, and titlebars.
+      const int target_sizes[] = {16, 24, 32, 48, 64, 128, 256, 512};
+      GList* icon_list = nullptr;
+      for (size_t i = 0; i < G_N_ELEMENTS(target_sizes); ++i) {
+        GdkPixbuf* scaled = gdk_pixbuf_scale_simple(
+            base_pixbuf, target_sizes[i], target_sizes[i], GDK_INTERP_BILINEAR);
+        if (scaled != nullptr) {
+          icon_list = g_list_append(icon_list, scaled);
+        }
+      }
+      icon_list = g_list_append(icon_list, base_pixbuf);
+
+      gtk_window_set_icon_list(window, icon_list);
+      gtk_window_set_default_icon_list(icon_list);
+      gtk_window_set_icon(window, base_pixbuf);
+
+      g_list_free_full(icon_list, g_object_unref);
+    } else if (error != nullptr) {
+      g_clear_error(&error);
+    }
+
+    if (exe_path != nullptr) {
+      ensure_desktop_integration(exe_path, found_icon_path);
+    }
+  }
+
+  gtk_window_set_default_icon_name(APPLICATION_ID);
+  gtk_window_set_icon_name(window, APPLICATION_ID);
+}
+
 // Implements GApplication::activate.
 static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
+
+  set_window_icon(window);
 
   // Use a header bar when running in GNOME as this is the common style used
   // by applications and is the setup most users will be using (e.g. Ubuntu
@@ -45,11 +168,11 @@ static void my_application_activate(GApplication* application) {
   if (use_header_bar) {
     GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "Phoenix Term");
+    gtk_header_bar_set_title(header_bar, "Phoenix Terminal");
     gtk_header_bar_set_show_close_button(header_bar, TRUE);
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   } else {
-    gtk_window_set_title(window, "Phoenix Term");
+    gtk_window_set_title(window, "Phoenix Terminal");
   }
 
   gtk_window_set_default_size(window, 1280, 720);
