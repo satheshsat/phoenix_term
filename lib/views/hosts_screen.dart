@@ -632,6 +632,9 @@ class _HostsScreenState extends State<HostsScreen> {
       '#3B82F6', // Blue
     ];
 
+    bool obscurePassword = true;
+    bool obscurePassphrase = true;
+
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -781,10 +784,23 @@ class _HostsScreenState extends State<HostsScreen> {
                         Expanded(
                           child: TextField(
                             controller: passController,
-                            obscureText: true,
-                            decoration: const InputDecoration(
+                            obscureText: obscurePassword,
+                            decoration: InputDecoration(
                               labelText: 'Password',
                               hintText: 'Optional if using key',
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                  size: 18,
+                                  color: obscurePassword ? AppColors.textSecondary : AppColors.cyan,
+                                ),
+                                tooltip: obscurePassword ? 'Show password' : 'Hide password',
+                                onPressed: () {
+                                  setDialogState(() {
+                                    obscurePassword = !obscurePassword;
+                                  });
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -820,9 +836,22 @@ class _HostsScreenState extends State<HostsScreen> {
                       const SizedBox(height: 14),
                       TextField(
                         controller: passphraseController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
+                        obscureText: obscurePassphrase,
+                        decoration: InputDecoration(
                           labelText: 'Key Passphrase (if encrypted)',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              obscurePassphrase ? Icons.visibility : Icons.visibility_off,
+                              size: 18,
+                              color: obscurePassphrase ? AppColors.textSecondary : AppColors.cyan,
+                            ),
+                            tooltip: obscurePassphrase ? 'Show passphrase' : 'Hide passphrase',
+                            onPressed: () {
+                              setDialogState(() {
+                                obscurePassphrase = !obscurePassphrase;
+                              });
+                            },
+                          ),
                         ),
                       ),
                     ],
